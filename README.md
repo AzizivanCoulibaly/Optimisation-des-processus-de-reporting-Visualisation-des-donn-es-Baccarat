@@ -1,6 +1,6 @@
 # Optimisation-des-processus-de-reporting-Visualisation-des-données-Baccarat
 ## Projets : Optimisation d’un reporting commercial avec Excel, Power Query & Power BI   
-un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage, l'analyse et la visualisation des indicateurs clés de performances.
+Un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage, l'analyse et la visualisation des indicateurs clés de performances.
 
 ### Problème rencontré 
 - Données dispersées sur plusieurs feuille et dans plusieurs dossiers
