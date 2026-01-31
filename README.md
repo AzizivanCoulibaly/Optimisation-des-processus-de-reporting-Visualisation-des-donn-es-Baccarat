@@ -1,99 +1,66 @@
 # Optimisation-des-processus-de-reporting-Visualisation-des-données-Baccarat
-## Projet : Consolidation et analyse de 4 millions de lignes de ventes multi-continents (2019–2022)  
+## Projets : Optimisation d’un reporting commercial avec Excel, Power Query & Power BI   
+un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage, l'analyse et la visualisation des indicateurs clés de performances.
 
-### Données brutes  
-[🌐 Télécharger le dataset complet](https://drive.google.com/drive/folders/1wVMY45d3gs_bTIdUYqQ7uSHOWxGzJt9-?usp=share_link)
+### Problème rencontré 
+- Données dispersées sur plusieurs feuille et dans plusieurs dossiers
+- Pas de Formatage des colonnes (dates, CA HT, ventes, Articles,  passages, Qte Remise, Remise HT, Qte Détaxe, Détaxe HT, Qte VAD, VAD ht, full prices, Qte Parfum, Parfum Ht, Qté Diversification, Diversification HT)
+- Pas de mise en forme conditionnel relative au weekend
+- Pas de suivi dynamique d’une année à l’autre
+- Calcul manuel des indicateurs : Panier moyen, Detaxe/CA, VAD/CA, Catégorie de produit (Full price, Parfum, Diversification)/CA par semaine/Mois/Année
+  
+  ---
+  
+  ### Étapes de traitement 
+ **Power Query**  
+- Nettoyage, homogénéisation et formatage des colonnes
+- Fusion des requêtes multi-mois : les classeurs possèdent 12 feuilles mensuelles. Après la fusion, le fichier obtenu est renommé "Données_ventesYYYY" chargé en tableau et rangé avec les autres années.
+- Création d’un modèle anticipant les futures années : production d’un fichier Excel optimisé avec des tableaux permettant le calcul automatique des indicateurs,  
+  ajout de nouvelles fonctionnalités (mise en forme conditionnelle des week-ends, filtre par semaine),  
+  et anticipation des années à venir jusqu’en 2030 
+- Normalisation des formats (dates, montants, devises)
 
+  **Power BI**
+  - Fusion des requêtes multi-année : après création, transformation et fusion multi-mois des classeurs annuels, je procède à la fusion multi-année des fichiers "Donnée_ventesYYYY"
+  pour obtenir une table de faits unique centralisant toutes les ventes passées et futures 2024-2030, facilitant ainsi les calculs et l’application des mesures DAX
+- Création d’une table calendrier (Date Table) afin de piloter le filtrage des données de ventes:
+  `Calendar = ADDCOLUMNS(
+    CALENDAR(DATE(2024,01,01),DATE(2030,12,01)),
+"ANNEE",YEAR([Date]),
+"SEMESTRE",IF(MONTH([Date])>=6,"S2","S1"))
+`,
+- Modélisation des données de mise en relation : Dans notre cas la table de fait est la table regroupant toutes les données de ventes et la table de dimensions est la table date préalablement créé
+- Mesures DAX :  
+  - `CA = SUM(Donnée_vente[CAHT])`  
+  - `CA N-1 = CALCULATE([CA], SAMEPERIODLASTYEAR(Calendar[Date]))` 
+  - `Ecart = divide([CA] - [CA N-1],[CA N-1])`
+  - `Panier moyen = divide([CA],sum(donnée_vente[ventes]))`
+  - `PM N-1 = CALCULATE([Panier moyen], SAMEPERIODLASTYEAR(Calendar[Date]))` 
+- Filtres dynamiques (année, mois) synchronisation des filtre, Page1,2,3 
+- Visualisations : histogrammes combiné,  donut chart, Cartes 123, matrice, mise en forme conditionnel
 
-### Problème rencontré  
-- Données brutes sous forme de fichiers texte dispersés (un fichier par continent : Afrique, Europe, Asie, Amérique)  
-- Table de correspondance pays–continent séparée (2 colonnes : Pays, Continent)  
-- Volume total de données : **4 millions de lignes** → limite technique d’Excel (1 million de lignes max)  
-- Fichiers lourds et éparpillés, mais nécessité de connecter les ventes aux continents pour l’analyse
-- Colonne pays non standardisé à cause des caractéres d'écriture Majuscule/minuscule
-
----
-
-### Étapes de traitement  
-
-**Importation des données (Power Query)**  
-- Importation depuis un dossier contenant les 4 fichiers texte (ventes 2019–2022 par continent)  
-- Importation de la table pays–continent (2 colonnes : Pays, Continent)  
-
-**Combinaison et nettoyage (Power Query)**  
-- Combinaison des 4 tables de ventes (“Afrique”, “Europe”, “Asie”, “Amérique”) → structure identique (Date, Pays, Qte, Prix unitaire)
-- Formatage des dates et des montants (devise normalisée)  
-- Standardisation des noms de pays (première lettre en majuscule)  
-- Transformation de la table pays–continent :  
-  - Standardisation des pays (première lettre en majuscule)  
-  - Promotion de la première ligne comme en-tête  
-##### Nettoyage des données  
-![Nettoyage des données brutes](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/0e9fac51b889b03a4081e4708b20be59545c222a/Images/Nettoyage%20%26%20transformation%20%26%20combinaison%20des%20fichiers.JPG)
- ---
-![Nettoyage pays-continent](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/8b11b42f1a40544875b3605b3c9a1a9375d6b61d/Images/Nettoyage%20table%20pays-continent.JPG)
-
-**Chargement dans Power Pivot**  
-- Les données ( 4M de lignes) sont **chargées uniquement en connexion** puis ** Ajouter au modèle de donnée* pour éviter de saturer Excel  
-- Les tables utilisées dans le modèle :  
-  - Table de faits = Ventes consolidées  
-  - Table de dimension = Pays–Continent 
-##### Chargement dans Power Pivo
-![Chargement dans Power Pivo](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/a7ddde83e127e2a109102c9e1e76cc18256fb176/Images/Charger%20au%20mode%CC%80le%20de%20donne%CC%81e%20power%20pivot.JPG
-)
-**Table calendrier (Power Pivot)**  
-- Création d’une table calendrier indépendante pour gérer le temps efficacement  
-- Étendue : 2019 → 2030 (anticipation des années futures)  
-- Évite d’ajouter des colonnes calculées dans la table de faits; une nouvelle colonne implique qu'elle s'étende sur 4 million de ligne
-- Ajout d'une colonne semestre pour affiner les analyses
-##### Table Calendrier
-![Table Calendrier](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/b06678e3036d517e3cb03a2472ae2e39ad90de49/Images/Ajout%20colonne%20semestre.JPG)
-
-**Modélisation relationnelle**  
-- Table centrale : **Ventes 2019-2022**  
-  - Connectée à la **Table Date** (clé = Date)  
-  - Connectée à la **Table Pays–Continent** (clé = Pays)  
-##### Modélisation des données
-![Modélisation des données](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/0aea8fe9e45bf766d3d50ea07db427a8012b6225/Images/Mode%CC%80le%20de%20donne%CC%81e.JPG)
-
-**Création de mesures (DAX)**  
-- `CA = SUMX(Ventes, Ventes[Qte] * Ventes[Prix unitaire])`  
-- `CA N-1 = CALCULATE([CA], DATEADD(Date[Date], -1, YEAR))`  
-- `Ecart = [CA] - [CA N-1]`  
-- `Part continent = DIVIDE([CA], CALCULATE([CA], ALL(PaysContinent[Continent])))`  
-
-**Analyse (Excel & Power BI)**  
-- Analyse via Tableaux Croisés Dynamiques (Excel) et réponse aux problématiques métiers (15 Questions)
-##### Questions et réponses  
-[🌐 Accéder aux analyses excel](https://drive.google.com/drive/folders/1wVMY45d3gs_bTIdUYqQ7uSHOWxGzJt9-?usp=share_link)
-![Q1,Q2,Q3](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/efcaea532f643369413a1be0b04e082a5e31d6cd/Images/WhatsApp%20Image%202025-09-30%20at%2019.06.49.jpeg)
-![Q4,Q5](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/9e5b3c568634c028adad28bfbcc43a6aef8b31eb/Images/WhatsApp%20Image%202025-09-30%20at%2019.06.54.jpeg)
-![Q6,Q7](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/6f7af6fb0a34cf88f00e237b6e5783b538629ec6/Images/WhatsApp%20Image%202025-09-30%20at%2019.06.56.jpeg)
-![Q8,Q9](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/6f7af6fb0a34cf88f00e237b6e5783b538629ec6/Images/WhatsApp%20Image%202025-09-30%20at%2019.06.58.jpeg)
-![Q10,Q11](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/6f7af6fb0a34cf88f00e237b6e5783b538629ec6/Images/WhatsApp%20Image%202025-09-30%20at%2019.06.59.jpeg)
-![Q12,Q13](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/6f7af6fb0a34cf88f00e237b6e5783b538629ec6/Images/WhatsApp%20Image%202025-09-30%20at%2019.07.00.jpeg)
-![Q14,Q15](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/6f7af6fb0a34cf88f00e237b6e5783b538629ec6/Images/WhatsApp%20Image%202025-09-30%20at%2019.07.00-2.jpeg)
-
-Visualisations dans Power BI : histogrammes, cartes, Treemap, Filtre
-[🌐 Accéder au visuel](https://drive.google.com/drive/folders/1wVMY45d3gs_bTIdUYqQ7uSHOWxGzJt9-?usp=share_link)
-![Power BI visuel](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/162b5f6011e88797ffc6c686e0ff1d9b0b2ce1a0/Images/Vente%20au%20continent.PNG)
-![Power BI visuel](https://github.com/AzizivanCoulibaly/AZIZ-COULIBALY/blob/3092e31028e92708d3f7b9b110787dd19fc25eed/Images/Vente%20au%20continent%20Asie_stylo%20et%20chaussure.PNG)
+   ---
+  
+#### Résultats quantitatifs  
+- Réduction du temps de rapport manuel de 1h30 à 20 minutes automatisées (gain de productivité de 78%)
+- Fiabilité des données : 98%
+- Adoption de l’outil par les équipes de ventes / manager au quotidien et lors des rapports mensuels à la hiérarchie
 
 ---
 
-### Résultats quantitatifs  
-- Consolidation de **4 millions de lignes** dans un modèle robuste et exploitable  
-- Réduction du temps de préparation : de plusieurs heures manuelles à quelques minutes automatisées  
-- Suivi par continent, pays et période possible en temps réel  
+#### Résultats qualitatifs   
+- Visualisations intuitives et interactive permettant à des non-techniciens de comprendre les performances en un coup d’œil 
+- Renforcement de la confiance du manager dans les données utilisées au quotidien
+- Suivi clair des écarts année N / N-1 ainsi que des indicateurs N/N-1
 
-### Résultats qualitatifs  
-- Visualisations intuitives permettant une comparaison claire entre continents  
-- Modèle extensible : ajout possible de nouvelles années ou continents sans refonte complète  
-- Adoption facilitée grâce à la disponibilité des données dans **Excel (TCD)** et **Power BI (dashboards interactifs)**  
+---
 
-### Résultats personnels  
-- Maîtrise du traitement de **volumétrie importante** (4M de lignes) grâce à Power Query + Power Pivot  
-- Expérience dans la **modélisation multi-tables** et la création d’une table calendrier optimisée  
-- Développement d’une approche analytique orientée “scalabilité” (anticipation des années futures jusqu’en 2030)  
-- Renforcement de ma capacité à relier la donnée brute à des **indicateurs business pertinents**  
+#### Résultats personnels  
+- Acquisition de compétences clés en **Excel, Power Query avancé, PowerBI, DAX et modélisation relationnelle**  
+- Développement d’une pédagogie pour vulgariser la donnée auprès d’équipes non techniques  
+- Capacité à mener un projet complet, de l'observation terrain à un outil exploitable et adopté  
+- Démonstration d’une capacité d'adaptation et d’apprentissage rapide 
+- Amélioration de ma rigueur analytique et de ma capacité à transformer les chiffres en recommandations stratégiques
+- Résilience face aux difficultés techniques par la recherche et l'expérimentation
 
 
