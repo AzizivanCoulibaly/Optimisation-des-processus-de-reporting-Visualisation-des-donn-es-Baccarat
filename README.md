@@ -2,6 +2,13 @@
 ## Projets : Optimisation d’un reporting commercial avec Excel, Power Query & Power BI   
 Un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage, l'analyse et la visualisation des indicateurs clés de performances.
 
+### Contexte & Besoin
+- Analyse de ventes Spontanés
+- Conception de Dashboard intuitif
+- Performance du rapport et des requêtes
+- Fiabilité des données mais aucune necessité de les avoir en temps réel
+- Mesure DAX complexe, Analyse temporelle
+  
 ### Problème rencontré 
 - Données dispersées sur plusieurs feuille et dans plusieurs dossiers
 - Pas de Formatage des colonnes (dates, CA HT, ventes, Articles,  passages, Qte Remise, Remise HT, Qte Détaxe, Détaxe HT, Qte VAD, VAD ht, full prices, Qte Parfum, Parfum Ht, Qté Diversification, Diversification HT)
