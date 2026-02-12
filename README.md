@@ -28,12 +28,12 @@ Un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage,
 
   ### Étapes de traitement 
  **Power Query**  
-- Nettoyage, homogénéisation et formatage des colonnes
 - Filtre des sous totaux
 - suppression des colonnes
-- Homogénéisation des caractère
-- Formatages des colonnes
-- Fusion des requêtes multi-mois : les classeurs possèdent 12 feuilles mensuelles. Après la fusion, le fichier obtenu est renommé "Données_ventesYYYY" chargé en tableau et rangé avec les autres années.
+- Homogénéisation des caractères
+- Formatage des colonnes
+- Fusion des requêtes multi-mois : les classeurs possèdent 12 feuilles mensuelles.
+Après la fusion, le fichier obtenu est renommé "Données_ventesYYYY" chargé en tableau et rangé avec les autres années.
 
   **Power BI**
   - Fusion des requêtes multi-année : après création, transformation et fusion multi-mois des classeurs annuels, je procède à la fusion multi-année des fichiers "Donnée_ventesYYYY"
