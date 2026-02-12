@@ -60,8 +60,9 @@ Après la fusion, le fichier obtenu est renommé "Données_ventesYYYY" chargé e
   - `PM N-1 = CALCULATE([Panier moyen], SAMEPERIODLASTYEAR(Calendar[Date]))` 
 - Filtres dynamiques (année, mois) synchronisation des filtre, Page1,2,3
 
-**Visualisation**
-  histogrammes combiné,  donut chart, Cartes 123, matrice, mise en forme conditionnel
+    **Visualisation**
+  
+histogrammes combiné,  donut chart, Cartes 123, matrice, mise en forme conditionnel
 Certaines interractions ont été modifié volontairement de sorte à ce que les visuels concernés soient dissociées de certains filtres afin de préserver une lecture stratégique globale .
 En effet, Le graphique représentant l'Evolution du CA au fil des mois est indépendant du filtre "Mois" car cela nous permet de conserver une vision complète des tendances temporelles tout en garantissant une analyse de la dynamique globale du business
 
