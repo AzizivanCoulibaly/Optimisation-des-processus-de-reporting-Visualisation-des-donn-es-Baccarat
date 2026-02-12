@@ -8,6 +8,8 @@ Un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage,
 - Performance du rapport et des requêtes
 - Fiabilité des données mais aucune necessité de les avoir en temps réel
 - Mesure DAX complexe, Analyse temporelle
+- Anticipé les Tableaux reporting locaux pour les 5 prochaines années
+- Assurer une lecture des indicateurs directement dans les fichiers de reporting - reduire les interractions Power BI
   
 ### Problème rencontré 
 - Données dispersées sur plusieurs feuille et dans plusieurs dossiers
@@ -17,15 +19,21 @@ Un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage,
 - Calcul manuel des indicateurs : Panier moyen, Detaxe/CA, VAD/CA, Catégorie de produit (Full price, Parfum, Diversification)/CA par semaine/Mois/Année
   
   ---
-  
+  ### Tableaux de reporting Anticipé :
+  - Création de fichiers reporting anticipant les futures années
+  - Production de fichiers Excel optimisés avec des tableaux permettant le calcul automatisé des indicateurs,
+  - Ajout de nouvelles fonctionnalités (mise en forme conditionnelle des week-ends, filtre par semaine, CA réalisé vs Objectif),
+
+  le but est de simplifier les étapes de transformation Power Query à venir afin de gagner en performance tout en simplifiant la lecture des données lors du reporting sans avoir besoin d'ouvrir Power BI. 
+
   ### Étapes de traitement 
  **Power Query**  
 - Nettoyage, homogénéisation et formatage des colonnes
+- Filtre des sous totaux
+- suppression des colonnes
+- Homogénéisation des caractère
+- Formatages des colonnes
 - Fusion des requêtes multi-mois : les classeurs possèdent 12 feuilles mensuelles. Après la fusion, le fichier obtenu est renommé "Données_ventesYYYY" chargé en tableau et rangé avec les autres années.
-- Création d’un modèle anticipant les futures années : production d’un fichier Excel optimisé avec des tableaux permettant le calcul automatique des indicateurs,  
-  ajout de nouvelles fonctionnalités (mise en forme conditionnelle des week-ends, filtre par semaine),  
-  et anticipation des années à venir jusqu’en 2030 
-- Normalisation des formats (dates, montants, devises)
 
   **Power BI**
   - Fusion des requêtes multi-année : après création, transformation et fusion multi-mois des classeurs annuels, je procède à la fusion multi-année des fichiers "Donnée_ventesYYYY"
@@ -35,9 +43,16 @@ Un fichier Excel non optimisé, multi-années, non exploitable pour le pilotage,
     CALENDAR(DATE(2024,01,01),DATE(2030,12,01)),
 "ANNEE",YEAR([Date]),
 "SEMESTRE",IF(MONTH([Date])>=6,"S2","S1"))
-`,
-- Modélisation des données de mise en relation : Dans notre cas la table de fait est la table regroupant toutes les données de ventes et la table de dimensions est la table date préalablement créé
-- Mesures DAX :  
+
+  **Modélisation des données**
+- Table de fait : Ventes 2019-2030
+- Table de dimension 1 : Table Date (clé commune = Date "JJ/MM/AAAA")
+- Modèle de donnée : Modèle semantique
+- Type de modèle : Star Schema
+- cardinalité : 1 à plusieurs entre la table de dimension et la table de fait
+- relation : filtre à sens unique
+   
+  **Mesures DAX** 
   - `CA = SUM(Donnée_vente[CAHT])`  
   - `CA N-1 = CALCULATE([CA], SAMEPERIODLASTYEAR(Calendar[Date]))` 
   - `Ecart = divide([CA] - [CA N-1],[CA N-1])`
